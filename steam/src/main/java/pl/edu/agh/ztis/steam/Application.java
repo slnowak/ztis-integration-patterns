@@ -14,6 +14,9 @@ public class Application {
     public static void main(String[] args) {
         System.out.println("Steam app started");
 
+        // todo: temporary, wait till rabbit container is ready
+        TimeUnit.SECONDS.sleep(30);
+
         final Environment environment = new Environment();
 
         final String steamApiKey = environment.getString("STEAM_API_KEY").orElseThrow(() -> new RuntimeException("steam api key missing"));
@@ -24,7 +27,7 @@ public class Application {
         final String rabbitUser = environment.getString("RABBIT_USER").orElse("guest");
         final String rabbitPassword = environment.getString("RABBIT_PASSWORD").orElse("guest");
         final String rabbitExchange = environment.getString("RABBIT_EXCHANGE").orElse("steam");
-        final String rabbitTopic = environment.getString("RABBIT_EXCHANGE").orElse("game_bought");
+        final String rabbitTopic = environment.getString("RABBIT_TOPIC").orElse("game_bought");
 
 
         final SteamClient steamClient = new SteamClient(steamApiKey);
@@ -41,7 +44,6 @@ public class Application {
 
         steamClient
                 .gamesOwnedBy(SteamUser.ofId(steamUser))
-                .delay(15, TimeUnit.SECONDS)
                 .subscribe(game -> {
                     System.out.println("About to publish event");
                     rabbitMQClient.publishMessage(game.toString());

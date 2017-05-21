@@ -9,3 +9,12 @@ services:
     build: ./steam
     depends_on:
       - "rabbitmq"
+    environment:
+      - STEAM_API_KEY=changeme
+      - STEAM_USER=76561197960434622
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_PORT=5672
+      - RABBIT_USER=guest
+      - RABBIT_PASSWORD=guest
+      - RABBIT_EXCHANGE=steam
+      - RABBIT_TOPIC=game_bought
