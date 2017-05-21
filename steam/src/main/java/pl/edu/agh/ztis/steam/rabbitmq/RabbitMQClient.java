@@ -21,6 +21,10 @@ public class RabbitMQClient implements AutoCloseable {
         return new RabbitMQClient(connection, message -> publishMessageOn(channel, props, message));
     }
 
+    public static RabbitMQClient create(RabbitMQProperties.RabbitMQPropertiesBuilder props) {
+        return create(props.build());
+    }
+
     @SneakyThrows
     private static Connection setUpConnection(RabbitMQProperties props) {
         final ConnectionFactory factory = new ConnectionFactory();

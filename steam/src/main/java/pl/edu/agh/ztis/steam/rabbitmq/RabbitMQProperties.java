@@ -12,12 +12,12 @@ public class RabbitMQProperties {
     @Builder.Default
     String password = "guest";
     @Builder.Default
-    String host = "rabbitmq";
+    String host = "localhost";
     @Builder.Default
     int port = 5672;
 
     @Builder.Default
-    String exchangeName = "steam_events";
+    String exchangeName = "sample_exchange";
     @Builder.Default
-    String topic = "steam";
+    String topic = "sample_topic";
 }
