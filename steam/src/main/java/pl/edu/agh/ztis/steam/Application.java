@@ -1,10 +1,10 @@
 package pl.edu.agh.ztis.steam;
 
 import lombok.SneakyThrows;
-import pl.edu.agh.ztis.steam.rabbitmq.RabbitMQClient;
-import pl.edu.agh.ztis.steam.rabbitmq.RabbitMQProperties;
-
-import java.util.concurrent.TimeUnit;
+import pl.edu.agh.ztis.steam.steam.OwnedGame;
+import pl.edu.agh.ztis.steam.steam.SteamClient;
+import pl.edu.agh.ztis.steam.steam.SteamUser;
+import rx.Observable;
 
 public class Application {
 
@@ -12,17 +12,16 @@ public class Application {
     public static void main(String[] args) {
         System.out.println("Steam app started");
 
-        final RabbitMQClient client = RabbitMQClient.create(
-                RabbitMQProperties.builder().host("rabbitmq").build()
+        final SteamClient client = new SteamClient(
+                "changeme"
         );
 
-        client.publishMessage("foo");
-        client.publishMessage("bar");
-        client.publishMessage("baz");
+        final Observable<OwnedGame> games = client.gamesOwnedBy(SteamUser.ofId("76561197960434622"));
+        games.subscribe(
+                System.out::println,
+                Throwable::printStackTrace
+        );
 
 
-        while (true) {
-            TimeUnit.SECONDS.sleep(15);
-        }
     }
 }
