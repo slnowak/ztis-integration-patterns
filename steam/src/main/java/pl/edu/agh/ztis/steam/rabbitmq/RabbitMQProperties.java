@@ -1,7 +1,23 @@
 package pl.edu.agh.ztis.steam.rabbitmq;
 
-import lombok.Value;
+import lombok.Builder;
+import lombok.Getter;
 
-@Value
-class RabbitMQProperties {
+@Builder
+@Getter
+public class RabbitMQProperties {
+
+    @Builder.Default
+    String username = "guest";
+    @Builder.Default
+    String password = "guest";
+    @Builder.Default
+    String host = "rabbitmq";
+    @Builder.Default
+    int port = 5672;
+
+    @Builder.Default
+    String exchangeName = "steam_events";
+    @Builder.Default
+    String topic = "steam";
 }
