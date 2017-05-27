@@ -1,7 +1,10 @@
 ﻿using Metacritic.Dto;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Metacritic
 {
@@ -27,12 +30,43 @@ namespace Metacritic
 
 
             Console.WriteLine($"games similar to {name}");
-            foreach(var item in GetRecomendations(name))
+            foreach (var item in GetRecomendations(name))
             {
                 Console.WriteLine($"{item.Name} -- {item.ApiDetailUrl}");
             }
 
             Console.ReadLine();
+
+
+            var rabbitConfig = new RabbitConfigFactory().CreateDefault();
+
+            var connectionFactory = new ConnectionFactory()
+            {
+                Port = rabbitConfig.Port,
+                HostName = rabbitConfig.Hostname,
+                UserName = rabbitConfig.UserName,
+                Password = rabbitConfig.Password
+            };
+
+            using (var connection = connectionFactory.CreateConnection())
+            {
+                using (var channel = connection.CreateModel())
+                {
+                    channel.QueueDeclare(queue: "sample_queue", autoDelete: false);
+
+
+                    var consumer = new EventingBasicConsumer(channel);
+                    consumer.Received += (model, arg) =>
+                    {
+                        var body = arg.Body;
+                        var message = Encoding.UTF8.GetString(body);
+
+                        Console.WriteLine(message);
+                    };
+
+                    channel.BasicConsume(queue: "sample_queue", noAck: true, consumer: consumer);
+                }
+            }
         }
     }
 }
