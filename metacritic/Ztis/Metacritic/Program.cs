@@ -1,21 +1,35 @@
-﻿using System;
+﻿using Metacritic.Dto;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Metacritic
 {
     class Program
     {
-        static void Main(string[] args)
+        private static IList<SimilarGame> GetRecomendations(string gameName)
         {
             var config = new MetacriticConfigFactory().Create();
             var metacritic = new MetacriticApi(config);
 
-            var result = metacritic.Search("gothic ii");
+            var games = metacritic.SearchGame(gameName);
 
-            var results = result["results"];
-            foreach(var item in results)
+            var bestMatch = games.First();
+
+            var game = metacritic.GetGameById(bestMatch.Id);
+
+            return game.SimilarGames.ToList();
+        }
+
+        static void Main(string[] args)
+        {
+            var name = "gothic ii";
+
+
+            Console.WriteLine($"games similar to {name}");
+            foreach(var item in GetRecomendations(name))
             {
-                var name = item["name"];
-                Console.WriteLine($"{name}\n");
+                Console.WriteLine($"{item.Name} -- {item.ApiDetailUrl}");
             }
 
             Console.ReadLine();
