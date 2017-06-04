@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace Metacritic
 {
-
     class MetacriticApi
     {
         private static readonly string baseUrl = "http://www.giantbomb.com/api/";
