@@ -1,36 +1,24 @@
-﻿using Metacritic.Dto;
-using RabbitMQ.Client;
+﻿using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Metacritic
 {
     class Program
     {
-        private static IList<SimilarGame> GetRecomendations(string gameName)
+        static void Main(string[] args)
         {
             var config = new MetacriticConfigFactory().Create();
             var metacritic = new MetacriticApi(config);
 
-            var games = metacritic.SearchGame(gameName);
 
-            var bestMatch = games.First();
-
-            var game = metacritic.GetGameById(bestMatch.Id);
-
-            return game.SimilarGames.ToList();
-        }
-
-        static void Main(string[] args)
-        {
             var name = "gothic ii";
 
-
             Console.WriteLine($"games similar to {name}");
-            foreach (var item in GetRecomendations(name))
+            var recomendations = metacritic.GetRecomendations(name).Result;
+
+            foreach (var item in recomendations)
             {
                 Console.WriteLine($"{item.Name} -- {item.ApiDetailUrl}");
             }

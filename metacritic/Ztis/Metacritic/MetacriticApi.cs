@@ -1,12 +1,15 @@
 ﻿using Metacritic.Dto;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using RestSharp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace Metacritic
 {
+
     class MetacriticApi
     {
         private static readonly string baseUrl = "http://www.giantbomb.com/api/";
@@ -21,47 +24,69 @@ namespace Metacritic
             _client = new RestClient(baseUrl);
         }
 
-        private JObject ExecuteRequest(RestRequest request)
+        private RestRequest NewGetRequest(string resource)
         {
-            var result = _client.ExecuteAsync(request).Result;
-            var content = result.Content;
+            var request = new RestRequest(resource, Method.GET);
 
-            return JObject.Parse(content);
-        }
-
-        public IList<SearchGameResult> SearchGame(string name)
-        {
-            var request = new RestRequest("search", Method.GET);
             request.AddHeader("User-Agent", userAgent);
-
             request.AddQueryParameter("api_key", _config.ApiKey);
             request.AddQueryParameter("format", "json");
+
+            return request;
+        }
+
+        private Task<TData> ExecuteAsync<TResponse, TData>(RestRequest request, Func<TResponse, TData> callback)
+            where TResponse : new()
+        {
+            var taskSource = new TaskCompletionSource<TData>();
+
+            _client.ExecuteAsync<TResponse>(request, response =>
+            {
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    var data = callback(JsonConvert.DeserializeObject<TResponse>(response.Content));
+                    taskSource.SetResult(data);
+                }
+                else
+                {
+                    taskSource.SetException(response.ErrorException ?? new Exception($"status code {response.StatusCode}"));
+                }
+            });
+
+            return taskSource.Task;
+        }
+
+        public Task<IList<SearchGameResult>> SearchGame(string name)
+        {
+            var request = NewGetRequest("search");
             request.AddQueryParameter("query", name);
             request.AddQueryParameter("resources", "game");
 
-            var json = ExecuteRequest(request);
+            var task = ExecuteAsync<SearchGameResponse, IList<SearchGameResult>>(request, response => response.Results);
 
-            var games = json["results"]
-                .Select(item => JsonConvert.DeserializeObject<SearchGameResult>(item.ToString()))
-                .ToList();
-
-            return games;
+            return task;
         }
 
-        public Game GetGameById(int id)
+        public Task<Game> GetGameById(int id)
         {
-            var request = new RestRequest("game/3030-{id}");
-            request.AddHeader("User-Agent", userAgent);
-
+            var request = NewGetRequest("game/3030-{id}");
             request.AddUrlSegment("id", id);
-            request.AddQueryParameter("api_key", _config.ApiKey);
-            request.AddQueryParameter("format", "json");
 
-            var json= ExecuteRequest(request);
+            var task = ExecuteAsync<GameByIdResponse, Game>(request, response => response.Results);
 
-            var game = JsonConvert.DeserializeObject<Game>(json["results"].ToString());
+            return task;
+        }
 
-            return game;
+
+        public async Task<IList<SimilarGame>> GetRecomendations(string gameName)
+        {
+            var games = await SearchGame(gameName);
+
+            var bestMatch = games.First();
+
+            var game = await GetGameById(bestMatch.Id);
+
+            return game.SimilarGames.ToList();
         }
     }
 }
