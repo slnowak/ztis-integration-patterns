@@ -30,7 +30,7 @@ services:
         condition: service_healthy
     environment:
       - META_KEY=changeme
-      - RABBIT_HOSTNAME=rabbitmq
+      - RABBIT_HOST=rabbitmq
       - RABBIT_PORT=5672
       - RABBIT_USER=guest
       - RABBIT_PASSWORD=guest
