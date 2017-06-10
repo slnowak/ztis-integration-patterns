@@ -2,7 +2,7 @@
 
 namespace Metacritic.Dto
 {
-    class Recomendation
+    class Recommendation
     {
         public int Id { get; set; }
 

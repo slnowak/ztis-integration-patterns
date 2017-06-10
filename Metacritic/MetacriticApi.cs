@@ -77,7 +77,7 @@ namespace Metacritic
         }
 
 
-        public async Task<IList<Recomendation>> GetRecomendations(string gameName)
+        public async Task<IList<Recommendation>> GetRecomendations(string gameName)
         {
             var games = await SearchGame(gameName);
 

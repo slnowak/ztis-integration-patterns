@@ -1,8 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using Metacritic.Dto;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Metacritic
@@ -65,13 +68,7 @@ namespace Metacritic
                         
                         var recomendations = metacritic.GetRecomendations(gameMessage.Title).Result;
 
-                        var result = new JObject
-                        {
-                            ["gameId"] = gameMessage.GameId,
-                            ["title"] = gameMessage.Title,
-                            ["recomendations"] = JsonConvert.SerializeObject(recomendations)
-                        };
-                        var bytes = Encoding.UTF8.GetBytes(result.ToString());
+                        var bytes = SerializeResults(recomendations, gameMessage);
 
                         channel.BasicPublish(exchange: exchangeName2, routingKey: topic2, body: bytes);
                     };
@@ -81,6 +78,27 @@ namespace Metacritic
                     Console.ReadLine();
                 }
             }
+        }
+
+        private static byte[] SerializeResults(IList<Recommendation> recomendations,GameMessage gameMessage)
+        {
+            var resultJson = new JObject
+            {
+                ["gameId"] = gameMessage.GameId,
+                ["title"] = gameMessage.Title,
+                ["recommendations"] = new JArray(recomendations.Select(rec =>
+                    new JObject
+                    {
+                        ["id"] = rec.Id,
+                        ["name"] = rec.Name,
+                        ["detailsApiUrl"] = rec.ApiDetailUrl,
+                        ["detailsSiteUrl"] = rec.SiteDetailUrl
+                    }))
+            };
+            var resultString = resultJson.ToString();
+            var resultBytes = Encoding.UTF8.GetBytes(resultString);
+
+            return resultBytes;
         }
     }
 }
