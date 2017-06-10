@@ -1,14 +1,19 @@
-version: '2'
+version: '2.2'
 services:
   rabbitmq:
     image: rabbitmq:3.6.9-management
     ports:
       - "15672:15672"
       - "5672:5672"
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "exec 6<>/dev/tcp/localhost/5672"]
+      interval: 1s
+      retries: 500
   steam-connector:
     build: ./steam
     depends_on:
-      - "rabbitmq"
+      rabbitmq:
+        condition: service_healthy
     environment:
       - STEAM_API_KEY=changeme
       - STEAM_USER=76561197960434622

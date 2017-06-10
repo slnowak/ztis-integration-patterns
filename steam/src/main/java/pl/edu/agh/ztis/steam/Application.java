@@ -6,16 +6,11 @@ import pl.edu.agh.ztis.steam.rabbitmq.RabbitMQProperties;
 import pl.edu.agh.ztis.steam.steam.SteamClient;
 import pl.edu.agh.ztis.steam.steam.SteamUser;
 
-import java.util.concurrent.TimeUnit;
-
 public class Application {
 
     @SneakyThrows
     public static void main(String[] args) {
         System.out.println("Steam app started");
-
-        // todo: temporary, wait till rabbit container is ready
-        TimeUnit.SECONDS.sleep(30);
 
         final Environment environment = new Environment();
 
