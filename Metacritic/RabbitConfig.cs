@@ -22,7 +22,7 @@ namespace Metacritic
 
             var portNr = int.Parse(port);
 
-            var hostname = Environment.GetEnvironmentVariable("RABBIT_HOSTNAME")
+            var hostname = Environment.GetEnvironmentVariable("RABBIT_HOST")
                 ?? throw new Exception("rabbit hostname was not defined");
 
             var user = Environment.GetEnvironmentVariable("RABBIT_USER")
