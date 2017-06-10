@@ -1,5 +1,6 @@
 package pl.edu.agh.ztis.steam.rabbitmq;
 
+import com.google.gson.Gson;
 import com.rabbitmq.client.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -10,15 +11,20 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class RabbitMQClient implements AutoCloseable {
 
+    private static final Gson ENCODER = new Gson();
+
     private final Connection connection;
-    private final Consumer<String> messagePublisher;
+    private final Consumer<Object> messagePublisher;
 
     @SneakyThrows
     public static RabbitMQClient create(RabbitMQProperties props) {
         final Connection connection = setUpConnection(props);
         final Channel channel = boundChannel(connection, props);
 
-        return new RabbitMQClient(connection, message -> publishMessageOn(channel, props, message));
+        return new RabbitMQClient(
+                connection,
+                message -> publishMessageOn(channel, props, message)
+        );
     }
 
     public static RabbitMQClient create(RabbitMQProperties.RabbitMQPropertiesBuilder props) {
@@ -50,11 +56,16 @@ public class RabbitMQClient implements AutoCloseable {
     }
 
     @SneakyThrows
-    private static void publishMessageOn(Channel channel, RabbitMQProperties props, String message) {
-        channel.basicPublish(props.getExchangeName(), "*", MessageProperties.TEXT_PLAIN, message.getBytes());
+    private static <T> void publishMessageOn(Channel channel, RabbitMQProperties props, T message) {
+        channel.basicPublish(
+                props.getExchangeName(),
+                "*",
+                MessageProperties.TEXT_PLAIN,
+                ENCODER.toJson(message).getBytes()
+        );
     }
 
-    public void publishMessage(String message) {
+    public <T> void publishMessage(T message) {
         messagePublisher.accept(message);
     }
 
