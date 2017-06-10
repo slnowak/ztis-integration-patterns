@@ -35,3 +35,15 @@ services:
       - RABBIT_PASSWORD=guest
   igdb:
     build: ./Igdb
+  orchestrator:
+      build: ./orchestrator
+      depends_on:
+        rabbitmq:
+          condition: service_healthy
+      environment:
+        - RABBIT_HOST=rabbitmq
+        - RABBIT_PORT=5672
+        - RABBIT_USER=guest
+        - RABBIT_PASSWORD=guest
+        - RABBIT_EXCHANGE=metacritic
+        - RABBIT_TOPIC=recommendations

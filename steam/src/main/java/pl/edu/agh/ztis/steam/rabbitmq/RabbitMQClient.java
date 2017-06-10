@@ -47,7 +47,7 @@ public class RabbitMQClient implements AutoCloseable {
         final Channel channel = connection.createChannel();
         channel.exchangeDeclare(props.getExchangeName(), BuiltinExchangeType.DIRECT, false);
         channel.queueBind(
-                channel.queueDeclare().getQueue(),
+                props.getTopic(),
                 props.getExchangeName(),
                 "*"
         );
