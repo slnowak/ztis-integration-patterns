@@ -1,4 +1,4 @@
-version: '2.2'
+version: '2.1'
 services:
   rabbitmq:
     image: rabbitmq:3.6.9-management
