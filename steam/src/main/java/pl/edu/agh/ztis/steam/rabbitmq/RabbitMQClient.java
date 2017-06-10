@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
+import java.util.Collections;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -45,11 +46,12 @@ public class RabbitMQClient implements AutoCloseable {
     @SneakyThrows
     private static Channel boundChannel(Connection connection, RabbitMQProperties props) {
         final Channel channel = connection.createChannel();
-        channel.exchangeDeclare(props.getExchangeName(), BuiltinExchangeType.DIRECT, false);
+        channel.exchangeDeclare(props.getExchangeName(), BuiltinExchangeType.TOPIC, false);
+        channel.queueDeclare(props.getTopic(), false, false, false, Collections.emptyMap());
         channel.queueBind(
-                props.getTopic(),
+                channel.queueDeclare().getQueue(),
                 props.getExchangeName(),
-                "*"
+                props.getTopic()
         );
 
         return channel;

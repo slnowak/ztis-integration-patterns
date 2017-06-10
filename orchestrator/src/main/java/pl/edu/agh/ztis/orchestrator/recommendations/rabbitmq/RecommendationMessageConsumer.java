@@ -11,6 +11,7 @@ import pl.edu.agh.ztis.orchestrator.recommendations.Recommendation;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 class RecommendationMessageConsumer implements Consumer {
@@ -57,8 +58,8 @@ class RecommendationMessageConsumer implements Consumer {
 
     private Recommendation recommendationFrom(RecommendationMessage recommendationMessage) {
         return new Recommendation(
-                recommendationMessage.game,
-                recommendationMessage.recommendations
+                recommendationMessage.title,
+                recommendationMessage.recommendations.stream().map(r -> r.name).collect(Collectors.toList())
         );
     }
 }

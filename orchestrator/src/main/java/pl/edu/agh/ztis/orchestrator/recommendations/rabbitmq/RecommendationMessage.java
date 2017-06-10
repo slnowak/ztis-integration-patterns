@@ -4,6 +4,10 @@ import java.util.List;
 
 class RecommendationMessage {
 
-    String game;
-    List<String> recommendations;
+    String title;
+    List<Recommendation> recommendations;
+
+    static class Recommendation {
+        String name;
+    }
 }

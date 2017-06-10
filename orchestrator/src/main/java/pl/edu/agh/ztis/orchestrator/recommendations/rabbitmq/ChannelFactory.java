@@ -6,6 +6,8 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import lombok.SneakyThrows;
 
+import java.util.Collections;
+
 class ChannelFactory {
 
     static Channel from(RabbitMQProperties props) {
@@ -27,11 +29,12 @@ class ChannelFactory {
     @SneakyThrows
     private static Channel boundChannel(Connection connection, RabbitMQProperties props) {
         final Channel channel = connection.createChannel();
-        channel.exchangeDeclare(props.getExchangeName(), BuiltinExchangeType.DIRECT);
+        channel.exchangeDeclare(props.getExchangeName(), BuiltinExchangeType.TOPIC);
+        channel.queueDeclare(props.getTopic(), false, false, false, Collections.emptyMap());
         channel.queueBind(
-                props.getTopic(),
+                channel.queueDeclare().getQueue(),
                 props.getExchangeName(),
-                "*"
+                props.getTopic()
         );
 
         return channel;
