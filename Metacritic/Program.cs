@@ -26,7 +26,7 @@ namespace Metacritic
             var metacritic = new MetacriticApi(config);
 
 
-            var rabbitConfig = new RabbitConfigFactory().CreateDefault();
+            var rabbitConfig = new RabbitConfigFactory().Create();
 
             var connectionFactory = new ConnectionFactory()
             {
