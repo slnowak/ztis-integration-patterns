@@ -9,6 +9,6 @@ namespace Metacritic.Dto
         public string Name { get; set; }
 
         [JsonProperty("similar_games")]
-        public SimilarGame[] SimilarGames { get; set; }
+        public Recomendation[] SimilarGames { get; set; }
     }
 }
