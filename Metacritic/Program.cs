@@ -10,14 +10,6 @@ using System.Text;
 
 namespace Metacritic
 {
-    class GameMessage
-    {
-        public int GameId { get; set; }
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public string[] Genres { get; set; }
-    }
-
     class Program
     {
         static void Main(string[] args)
@@ -25,9 +17,7 @@ namespace Metacritic
             var config = new MetacriticConfigFactory().Create();
             var metacritic = new MetacriticApi(config);
 
-
             var rabbitConfig = new RabbitConfigFactory().Create();
-
             var connectionFactory = new ConnectionFactory()
             {
                 Port = rabbitConfig.Port,
