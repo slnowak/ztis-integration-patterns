@@ -48,9 +48,16 @@ namespace Metacritic
                     
 
 
-                    var consumer = new EventingBasicConsumer(channel);
-                    consumer.Received += (model, arg) =>
+                    var consumer = new QueueingBasicConsumer(channel);
+
+                    channel.BasicConsume(queue: inputQueueName, noAck: true, consumer: consumer);
+
+                    Console.WriteLine("metacritic up");
+
+                    while (true)
                     {
+                        var arg = consumer.Queue.Dequeue();
+
                         var body = arg.Body;
                         var message = Encoding.UTF8.GetString(body);
 
@@ -61,11 +68,7 @@ namespace Metacritic
                         var bytes = SerializeResults(recomendations, gameMessage);
 
                         channel.BasicPublish(exchange: exchangeName2, routingKey: topic2, body: bytes);
-                    };
-
-                    channel.BasicConsume(queue: inputQueueName, noAck: true, consumer: consumer);
-
-                    Console.ReadLine();
+                    }
                 }
             }
         }
