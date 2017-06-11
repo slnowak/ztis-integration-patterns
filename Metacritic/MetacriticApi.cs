@@ -84,11 +84,18 @@ namespace Metacritic
         {
             var games = await SearchGame(gameName);
 
-            var bestMatch = games.First();
+            var bestMatch = games.FirstOrDefault();
 
-            var game = await GetGameById(bestMatch.Id);
+            if (bestMatch != null)
+            {
+                var game = await GetGameById(bestMatch.Id);
 
-            return game.SimilarGames.ToList();
+                return (game.SimilarGames ?? new Recommendation[0]).ToList();
+            }
+            else
+            {
+                return new List<Recommendation>();
+            }
         }
     }
 }
