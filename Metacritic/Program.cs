@@ -32,23 +32,17 @@ namespace Metacritic
                 {
                     // input queue
                     // TODO move to configuration
-                    var exchangeName = "steam";
-                    var topic = "game_bought";
+                    var exchangeName = "ztis-integration-patterns";
+                    var topic = "game_purchase";
 
-                    channel.ExchangeDeclare(exchange: exchangeName, type: "topic");
+                    channel.ExchangeDeclare(exchange: exchangeName, type: "direct");
                     var inputQueueName = channel.QueueDeclare().QueueName;
 
                     channel.QueueBind(queue: inputQueueName, exchange: exchangeName, routingKey: topic);
 
-                    // output exchange
-                    var exchangeName2 = "metacritic";
-                    var topic2 = "recomendations";
-
-                    channel.ExchangeDeclare(exchange: exchangeName2, type: "topic");
-                    
-
-
+                    var topic2 = "recommendation";
                     var consumer = new QueueingBasicConsumer(channel);
+                    channel.QueueBind(queue: channel.QueueDeclare().QueueName, exchange: exchangeName, routingKey: topic2);
 
                     channel.BasicConsume(queue: inputQueueName, noAck: true, consumer: consumer);
 
@@ -57,7 +51,6 @@ namespace Metacritic
                     while (true)
                     {
                         var arg = consumer.Queue.Dequeue();
-
                         var body = arg.Body;
                         var message = Encoding.UTF8.GetString(body);
 
@@ -67,7 +60,7 @@ namespace Metacritic
 
                         var bytes = SerializeResults(recomendations, gameMessage);
 
-                        channel.BasicPublish(exchange: exchangeName2, routingKey: topic2, body: bytes);
+                        channel.BasicPublish(exchange: exchangeName, routingKey: topic2, body: bytes);
                     }
                 }
             }

@@ -6,6 +6,7 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import pl.edu.agh.ztis.orchestrator.recommendations.Recommendation;
 import pl.edu.agh.ztis.orchestrator.recommendations.RecommendationClient;
 
@@ -13,6 +14,7 @@ import pl.edu.agh.ztis.orchestrator.recommendations.RecommendationClient;
 public class RabbitMQRecommendationClient implements RecommendationClient {
 
     private final Channel channel;
+    private final String queueName;
     private final Gson DECODER = new Gson();
 
     public static RabbitMQRecommendationClient create(RabbitMQProperties.RabbitMQPropertiesBuilder props) {
@@ -20,14 +22,16 @@ public class RabbitMQRecommendationClient implements RecommendationClient {
     }
 
     private static RabbitMQRecommendationClient create(RabbitMQProperties props) {
-        return new RabbitMQRecommendationClient(ChannelFactory.from(props));
+        final ChannelFactory.ChannelWithBoundQueue channelWithQueue = ChannelFactory.from(props);
+        return new RabbitMQRecommendationClient(channelWithQueue.channel, channelWithQueue.boundQueue);
     }
 
     @Override
+    @SneakyThrows
     public Flowable<Recommendation> recommendations() {
         return Flowable.create(
                 emitter -> channel.basicConsume(
-                        channel.queueDeclare().getQueue(),
+                        queueName,
                         true,
                         new RecommendationMessageConsumer(emitter, DECODER)
                 ),
