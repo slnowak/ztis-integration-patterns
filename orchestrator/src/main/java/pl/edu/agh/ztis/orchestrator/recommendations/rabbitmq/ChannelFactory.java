@@ -4,13 +4,12 @@ import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-
-import java.util.Collections;
 
 class ChannelFactory {
 
-    static Channel from(RabbitMQProperties props) {
+    static ChannelWithBoundQueue from(RabbitMQProperties props) {
         final Connection connection = setUpConnection(props);
         return boundChannel(connection, props);
     }
@@ -27,15 +26,22 @@ class ChannelFactory {
     }
 
     @SneakyThrows
-    private static Channel boundChannel(Connection connection, RabbitMQProperties props) {
+    private static ChannelWithBoundQueue boundChannel(Connection connection, RabbitMQProperties props) {
         final Channel channel = connection.createChannel();
         channel.exchangeDeclare(props.getExchangeName(), BuiltinExchangeType.DIRECT);
+        final String boundQueue = channel.queueDeclare().getQueue();
         channel.queueBind(
-                channel.queueDeclare().getQueue(),
+                boundQueue,
                 props.getExchangeName(),
                 props.getTopic()
         );
 
-        return channel;
+        return new ChannelWithBoundQueue(channel, boundQueue);
+    }
+
+    @RequiredArgsConstructor
+    static class ChannelWithBoundQueue {
+        final Channel channel;
+        final String boundQueue;
     }
 }

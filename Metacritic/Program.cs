@@ -51,7 +51,6 @@ namespace Metacritic
                     while (true)
                     {
                         var arg = consumer.Queue.Dequeue();
-                        Console.WriteLine("dequeued");
                         var body = arg.Body;
                         var message = Encoding.UTF8.GetString(body);
 

@@ -11,6 +11,7 @@ import pl.edu.agh.ztis.orchestrator.recommendations.Recommendation;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -49,7 +50,7 @@ class RecommendationMessageConsumer implements Consumer {
 
     private RecommendationMessage encodeMessage(AMQP.BasicProperties properties, byte[] body) throws UnsupportedEncodingException {
         return decoder.fromJson(
-                new String(body, properties.getContentEncoding()),
+                new String(body, Charset.defaultCharset()),
                 RecommendationMessage.class
         );
     }
