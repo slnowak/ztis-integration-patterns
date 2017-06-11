@@ -6,6 +6,8 @@ import pl.edu.agh.ztis.steam.rabbitmq.RabbitMQProperties;
 import pl.edu.agh.ztis.steam.steam.SteamClient;
 import pl.edu.agh.ztis.steam.steam.SteamUser;
 
+import java.util.concurrent.TimeUnit;
+
 public class Application {
 
     @SneakyThrows
@@ -39,6 +41,7 @@ public class Application {
 
         steamClient
                 .gamesOwnedBy(SteamUser.ofId(steamUser))
+                .delay(30, TimeUnit.SECONDS)
                 .subscribe(game -> {
                     System.out.println("Game bought: " + game);
                     rabbitMQClient.publishMessage(game);

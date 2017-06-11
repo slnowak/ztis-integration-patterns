@@ -24,7 +24,7 @@ services:
       - RABBIT_EXCHANGE=ztis-integration-patterns
       - RABBIT_TOPIC=game_purchase
   metacritic:
-    build: ./Metacritic
+    build: ./metacritic
     depends_on:
       rabbitmq:
         condition: service_healthy

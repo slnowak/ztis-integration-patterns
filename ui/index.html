@@ -1,34 +1,43 @@
-<!DOCTYPE HTML>
 <html>
 <head>
 
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
     <script type="text/javascript">
-        function WebSocketTest()
-        {
-            if ("WebSocket" in window)
-            {
-                alert("WebSocket is supported by your Browser!");
+        window.onload = () => RecommendationStore().onNewRecommendationDo(appendRecommendationsToBody);
 
-                // Let us open a web socket
-                var ws = new WebSocket("ws://192.168.99.100:8080/recommendations");
+        function appendRecommendationsToBody(game, recommendedGames) {
+            let games = recommendedGames
+                .map(game => `<li>${game}</li>`)
+                .join('\n');
 
-                ws.onmessage = function (evt)
-                {
-                    var received_msg = evt.data;
-                    alert("Message is received...");
-                };
+            $(".recommendations").prepend(`
+                <div class="jumbotron">
+                    <h3>Congratulations! You've recently bought <b>${game}</b></h3>
+                    <br/>
+                    <p>
+                        <span>You might be also interested in the following games: </span>
+                        <ul>
+                            ${games}
+                        </ul>
+                    </p>
+                </div>
+            `);
+        }
 
-                ws.onclose = function()
-                {
-                    // websocket is closed.
-                    alert("Connection is closed...");
-                };
-            }
-
-            else
-            {
-                // The browser doesn't support WebSocket
-                alert("WebSocket NOT supported by your Browser!");
+        function RecommendationStore(serverUri = 'ws://192.168.99.100:8080/recommendations') {
+            return {
+                onNewRecommendationDo: function (recommendationCallback) {
+                    let ws = new WebSocket(serverUri);
+                    ws.onmessage = evt => {
+                        let recommendation = JSON.parse(evt.data);
+                        recommendationCallback(
+                            recommendation['gameBought'],
+                            recommendation['recommendedGames']
+                        )
+                    }
+                }
             }
         }
     </script>
@@ -36,8 +45,9 @@
 </head>
 <body>
 
-<div id="sse">
-    <a href="javascript:WebSocketTest()">Run WebSocket</a>
+<div id="main" class="container">
+    <h1>ZTiS Integration Patterns - queues</h1>
+    <div class="recommendations"></div>
 </div>
 
 </body>
