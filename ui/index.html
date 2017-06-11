@@ -26,7 +26,7 @@
             `);
         }
 
-        function RecommendationStore(serverUri = 'ws://192.168.99.100:8080/recommendations') {
+        function RecommendationStore(serverUri = 'ws://localhost:8080/recommendations') {
             return {
                 onNewRecommendationDo: function (recommendationCallback) {
                     let ws = new WebSocket(serverUri);
