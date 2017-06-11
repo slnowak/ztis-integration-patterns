@@ -1,8 +1,8 @@
 package pl.edu.agh.ztis.orchestrator.recommendations;
 
-import io.reactivex.Flowable;
+import rx.Observable;
 
 public interface RecommendationClient {
 
-    Flowable<Recommendation> recommendations();
+    Observable<Recommendation> recommendations();
 }

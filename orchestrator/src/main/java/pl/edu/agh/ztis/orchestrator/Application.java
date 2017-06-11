@@ -3,6 +3,9 @@ package pl.edu.agh.ztis.orchestrator;
 import pl.edu.agh.ztis.orchestrator.recommendations.RecommendationClient;
 import pl.edu.agh.ztis.orchestrator.recommendations.rabbitmq.RabbitMQProperties;
 import pl.edu.agh.ztis.orchestrator.recommendations.rabbitmq.RabbitMQRecommendationClient;
+import pl.edu.agh.ztis.orchestrator.websockets.JettyWebSocketServerFactory;
+import pl.edu.agh.ztis.orchestrator.websockets.WebSocketProperties;
+import pl.edu.agh.ztis.orchestrator.websockets.WebSocketsServer;
 
 public class Application {
 
@@ -28,10 +31,15 @@ public class Application {
                         .topic(rabbitTopic)
         );
 
+        final WebSocketsServer webSockets = JettyWebSocketServerFactory.create(WebSocketProperties.builder());
+
         recommendationClient
                 .recommendations()
                 .subscribe(
-                        recommendation -> System.out.println("Got recommendation: " + recommendation),
+                        recommendation -> {
+                            System.out.println("About to send recommendation: " + recommendation);
+                            webSockets.publish(recommendation);
+                        },
                         error -> System.out.println("Got error: " + error),
                         () -> System.out.println("End of recommendation stream")
                 );

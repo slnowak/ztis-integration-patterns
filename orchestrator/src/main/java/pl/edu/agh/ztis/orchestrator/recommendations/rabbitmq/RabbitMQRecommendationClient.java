@@ -2,13 +2,13 @@ package pl.edu.agh.ztis.orchestrator.recommendations.rabbitmq;
 
 import com.google.gson.Gson;
 import com.rabbitmq.client.Channel;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import pl.edu.agh.ztis.orchestrator.recommendations.Recommendation;
 import pl.edu.agh.ztis.orchestrator.recommendations.RecommendationClient;
+import rx.Emitter;
+import rx.Observable;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class RabbitMQRecommendationClient implements RecommendationClient {
@@ -27,16 +27,19 @@ public class RabbitMQRecommendationClient implements RecommendationClient {
     }
 
     @Override
-    @SneakyThrows
-    public Flowable<Recommendation> recommendations() {
-        return Flowable.create(
-                emitter -> channel.basicConsume(
-                        queueName,
-                        true,
-                        new RecommendationMessageConsumer(emitter, DECODER)
-                ),
-                BackpressureStrategy.BUFFER
+    public Observable<Recommendation> recommendations() {
+        return Observable.create(
+                this::streamRecommendations,
+                Emitter.BackpressureMode.BUFFER
         );
     }
 
+    @SneakyThrows
+    private String streamRecommendations(Emitter<Recommendation> emitter) {
+        return channel.basicConsume(
+                queueName,
+                true,
+                new RecommendationMessageConsumer(emitter, DECODER)
+        );
+    }
 }

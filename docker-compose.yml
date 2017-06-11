@@ -46,3 +46,5 @@ services:
         - RABBIT_PASSWORD=guest
         - RABBIT_EXCHANGE=ztis-integration-patterns
         - RABBIT_TOPIC=recommendation
+      ports:
+        - "8080:8080"

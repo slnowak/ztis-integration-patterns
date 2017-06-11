@@ -5,7 +5,6 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.ShutdownSignalException;
-import io.reactivex.Emitter;
 import lombok.RequiredArgsConstructor;
 import pl.edu.agh.ztis.orchestrator.recommendations.Recommendation;
 
@@ -16,7 +15,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 class RecommendationMessageConsumer implements Consumer {
-    private final Emitter<Recommendation> emitter;
+    private final rx.Emitter<Recommendation> emitter;
     private final Gson decoder;
 
     @Override
@@ -25,12 +24,12 @@ class RecommendationMessageConsumer implements Consumer {
 
     @Override
     public void handleCancelOk(String consumerTag) {
-        emitter.onComplete();
+        emitter.onCompleted();
     }
 
     @Override
     public void handleCancel(String consumerTag) throws IOException {
-        emitter.onComplete();
+        emitter.onCompleted();
     }
 
     @Override
