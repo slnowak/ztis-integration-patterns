@@ -60,6 +60,8 @@ namespace Metacritic
             var request = NewGetRequest("search");
             request.AddQueryParameter("query", name);
             request.AddQueryParameter("resources", "game");
+            request.AddQueryParameter("field_list", "id,name,deck,number_of_user_reviews,api_detail_url,original_game_rating");
+            request.AddQueryParameter("limit", "1");
 
             var task = ExecuteAsync<SearchGameResponse, IList<SearchGameResult>>(request, response => response.Results);
 
@@ -70,6 +72,7 @@ namespace Metacritic
         {
             var request = NewGetRequest("game/3030-{id}");
             request.AddUrlSegment("id", id);
+            request.AddQueryParameter("field_list", "id,name,similar_games");
 
             var task = ExecuteAsync<GameByIdResponse, Game>(request, response => response.Results);
 
