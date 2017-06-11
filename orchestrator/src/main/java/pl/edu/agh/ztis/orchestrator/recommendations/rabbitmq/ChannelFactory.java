@@ -29,8 +29,7 @@ class ChannelFactory {
     @SneakyThrows
     private static Channel boundChannel(Connection connection, RabbitMQProperties props) {
         final Channel channel = connection.createChannel();
-        channel.exchangeDeclare(props.getExchangeName(), BuiltinExchangeType.TOPIC);
-        channel.queueDeclare(props.getTopic(), false, false, false, Collections.emptyMap());
+        channel.exchangeDeclare(props.getExchangeName(), BuiltinExchangeType.DIRECT);
         channel.queueBind(
                 channel.queueDeclare().getQueue(),
                 props.getExchangeName(),

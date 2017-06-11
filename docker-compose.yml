@@ -21,8 +21,8 @@ services:
       - RABBIT_PORT=5672
       - RABBIT_USER=guest
       - RABBIT_PASSWORD=guest
-      - RABBIT_EXCHANGE=steam
-      - RABBIT_TOPIC=game_bought
+      - RABBIT_EXCHANGE=ztis-integration-patterns
+      - RABBIT_TOPIC=game_purchase
   metacritic:
     build: ./Metacritic
     depends_on:
@@ -34,8 +34,6 @@ services:
       - RABBIT_PORT=5672
       - RABBIT_USER=guest
       - RABBIT_PASSWORD=guest
-  igdb:
-    build: ./Igdb
   orchestrator:
       build: ./orchestrator
       depends_on:
@@ -46,5 +44,5 @@ services:
         - RABBIT_PORT=5672
         - RABBIT_USER=guest
         - RABBIT_PASSWORD=guest
-        - RABBIT_EXCHANGE=metacritic
-        - RABBIT_TOPIC=recommendations
+        - RABBIT_EXCHANGE=ztis-integration-patterns
+        - RABBIT_TOPIC=recommendation

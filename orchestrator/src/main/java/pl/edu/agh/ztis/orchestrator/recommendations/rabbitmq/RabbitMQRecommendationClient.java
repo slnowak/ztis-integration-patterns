@@ -6,8 +6,11 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import pl.edu.agh.ztis.orchestrator.recommendations.Recommendation;
 import pl.edu.agh.ztis.orchestrator.recommendations.RecommendationClient;
+
+import java.nio.charset.Charset;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class RabbitMQRecommendationClient implements RecommendationClient {
@@ -24,6 +27,7 @@ public class RabbitMQRecommendationClient implements RecommendationClient {
     }
 
     @Override
+    @SneakyThrows
     public Flowable<Recommendation> recommendations() {
         return Flowable.create(
                 emitter -> channel.basicConsume(

@@ -25,7 +25,6 @@ class RecommendationMessageConsumer implements Consumer {
     @Override
     public void handleCancelOk(String consumerTag) {
         emitter.onComplete();
-
     }
 
     @Override
@@ -40,7 +39,6 @@ class RecommendationMessageConsumer implements Consumer {
 
     @Override
     public void handleRecoverOk(String consumerTag) {
-
     }
 
     @Override
