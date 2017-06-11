@@ -40,7 +40,7 @@ public class Application {
         steamClient
                 .gamesOwnedBy(SteamUser.ofId(steamUser))
                 .subscribe(game -> {
-                    System.out.println("About to publish event");
+                    System.out.println("Game bought: " + game);
                     rabbitMQClient.publishMessage(game);
                 });
     }
