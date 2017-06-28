@@ -1,4 +1,4 @@
-#ZTIS AGH
+ZTIS AGH
 Sample project for ZTIS AGH, integrating multiple services via rabbitmq.
 
 Requirements:
